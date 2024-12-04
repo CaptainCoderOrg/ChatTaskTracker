@@ -47,14 +47,13 @@ public static class TaskEntryExtensions
     public const string DaySuffixRegex = "st|nd|rd|th";
     public static DateTime StartTime(this TaskEntry entry)
     {
-        string formatted = Regex.Replace(entry.DateTime, @$"(\d+)({DaySuffixRegex})", "$1").ToLower().Trim();
-        string format = "MMM d yyyy h:mm tt";
-        if (DateTime.TryParseExact(formatted, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime result))
+        if(!long.TryParse(entry.DateTime, out long unixTimeSeconds))
         {
-            return result;
+            Debug.LogError($"Invalid date format: '{entry.DateTime}'");
+            return default;
         }
-        Debug.LogError($"Invalid date format: '{entry.DateTime}'");
-        return default;
+        
+        return DateTimeOffset.FromUnixTimeSeconds(unixTimeSeconds).LocalDateTime;
     }
 
 }
