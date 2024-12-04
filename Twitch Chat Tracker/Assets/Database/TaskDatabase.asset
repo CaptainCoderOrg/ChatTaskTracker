@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf3a8f66563cab846b6a58a5284c16d8, type: 3}
+  m_Name: TaskDatabase
+  m_EditorClassIdentifier: 
+  <FilePath>k__BackingField: D:\Captain Coder\Logs\Tasks\tasks.txt
+  <Entries>k__BackingField:
+  - DateTime: Dec 4th 2024 11:44 am
+    User: thecaptaincoder
+    TaskType: SetTask
+    Description: ' some new task'
+  - DateTime: Dec 4th 2024 11:45 am
+    User: thecaptaincoder
+    TaskType: SetTask
+    Description: ' another task'
+  - DateTime: 
+    User: 
+    TaskType: 
+    Description: 
+  - DateTime: Dec 4th 2024 11:45 am
+    User: thecaptaincoder
+    TaskType: SetTask
+    Description: ' task with a -- inside of the description -- more'
+  - DateTime: Dec 4th 2024 11:58 am
+    User: thecaptaincoder
+    TaskType: SetTask
+    Description: ' a new task'
+  - DateTime: Dec 4th 2024 12:00 pm
+    User: thecaptaincoder
+    TaskType: SetTask
+    Description: ' another task'
+  - DateTime: Dec 4th 2024 12:57 pm
+    User: thecaptaincoder
+    TaskType: SetTask
+    Description: ' Working on Task Tracker'
+  - DateTime: Dec 4th 2024 12:57 pm
+    User: mrzombieuk
+    TaskType: SetTask
+    Description: ' Apply textures to materials on change'
+  - DateTime: Dec 4th 2024 1:11 pm
+    User: thecaptaincoder
+    TaskType: SetTask
+    Description: ' changing task'
+  <OnTaskAdded>k__BackingField:
+    m_PersistentCalls:
+      m_Calls: []
