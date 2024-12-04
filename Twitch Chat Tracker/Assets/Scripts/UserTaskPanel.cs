@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using NaughtyAttributes;
 using TMPro;
@@ -19,7 +20,23 @@ public class TaskPanel : MonoBehaviour
             RenderTask(entry);
         }
         Tasks.OnTaskAdded.AddListener(RenderTask);
-        
+        StartCoroutine(Tick());
+    }
+
+    public IEnumerator Tick()
+    {
+        YieldInstruction second = new WaitForSeconds(1);
+        while (true)
+        {
+            foreach (var task in _userLookup.Values)
+            {
+                if (task.isActiveAndEnabled)
+                {
+                    task.UpdateTime();
+                }
+            }
+            yield return second;
+        }
     }
 
     [Button("ForceUpdate")]
@@ -34,6 +51,7 @@ public class TaskPanel : MonoBehaviour
         if (!_userLookup.TryGetValue(entry.User, out CurrentTaskEntry cte))
         {
             cte = Instantiate(EntryPrefab, Parent);
+            cte.name = $"{entry.User} (CurrentTaskEntry)";
             _userLookup.Add(entry.User, cte);
         }
         cte.SetTask(entry);

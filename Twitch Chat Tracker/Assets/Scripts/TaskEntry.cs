@@ -1,11 +1,17 @@
+using System;
+using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 [System.Serializable]
 public class TaskEntry
 {
+    public const string CompleteTaskTag = "CompleteTask";
+    public const string SetTaskTag = "SetTask";
     public const string Seperator = " -- ";
     public const string TaskSetCommand = "!task set";
+    public const string TaskCompleteCommand = "!task done";
     public string DateTime;
     public string User;
     public string TaskType;
@@ -31,4 +37,24 @@ public class TaskEntry
         entry = new TaskEntry(elements);
         return true;
     }
+
+    internal bool IsComplete() => TaskType == CompleteTaskTag;
+    internal bool IsSetTask() => TaskType == SetTaskTag;
+}
+
+public static class TaskEntryExtensions
+{
+    public const string DaySuffixRegex = "st|nd|rd|th";
+    public static DateTime StartTime(this TaskEntry entry)
+    {
+        string formatted = Regex.Replace(entry.DateTime, @$"(\d+)({DaySuffixRegex})", "$1").ToLower().Trim();
+        string format = "MMM d yyyy h:mm tt";
+        if (DateTime.TryParseExact(formatted, format, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime result))
+        {
+            return result;
+        }
+        Debug.LogError($"Invalid date format: '{entry.DateTime}'");
+        return default;
+    }
+
 }
