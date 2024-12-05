@@ -8,10 +8,13 @@ public class WorkTimerReader : MonoBehaviour
 {
     public const string WorkCommand = "!work";
     public const string BreakCommand = "!break";
+    public const string PomoCommand = "!pomo";
     [field: SerializeField]
     public AudioSource BreakTimeSound { get; private set; }
     [field: SerializeField]
     public bool PlayOnTimesUp = false;
+    [field: SerializeField]
+    public bool IsWorking = false;
     [field: SerializeField]
     public TextMeshProUGUI BreakText { get; private set; }
     [field: SerializeField]
@@ -22,9 +25,15 @@ public class WorkTimerReader : MonoBehaviour
     [field: SerializeField]
     public int Minutes { get; private set; }
     [field: SerializeField]
+    public int WorkMinutes { get; private set; }
+    [field: SerializeField]
+    public int BreakMinutes { get; private set; }
+    [field: SerializeField]
     public long StartTime { get; private set; }
     [field: SerializeField]
     public DateTime EndTime { get; private set; }
+    [field: SerializeField]
+    public DateTime StartDateTime { get; private set; }
     [field: SerializeField]
     public string Command { get; private set; }
 
@@ -39,9 +48,21 @@ public class WorkTimerReader : MonoBehaviour
             _rawTimer = value;
             string[] parts = value.Trim().Split(' ');
             Command = parts[0].Trim();
-            Minutes = int.Parse(parts[1]);
+            if (Command is PomoCommand)
+            {
+                string[] pomoParts = parts[1].Split('/');
+                WorkMinutes = Minutes = int.Parse(pomoParts[0]);
+                BreakMinutes = int.Parse(pomoParts[1]);
+            }
+            else
+            {
+                Minutes = int.Parse(parts[1]);
+            }
+            
             StartTime = long.Parse(parts[2]);
-            EndTime = DateTimeOffset.FromUnixTimeSeconds(StartTime).LocalDateTime + new TimeSpan(0, Minutes, 0);
+            StartDateTime = DateTimeOffset.FromUnixTimeSeconds(StartTime).LocalDateTime;
+            Debug.Log(StartDateTime);
+            EndTime = StartDateTime + new TimeSpan(0, Minutes, 0);
         }
     }
 
@@ -64,8 +85,48 @@ public class WorkTimerReader : MonoBehaviour
             {
                 HandleBreakCommand();
             }
+            else if (Command is PomoCommand)
+            {
+                HandlePomoCommand();
+            }
 
             yield return delay;
+        }
+    }
+
+    private void HandlePomoCommand()
+    {
+        TimeSpan TimePassed = DateTime.Now - StartDateTime;
+        int secondsPassed = (int)TimePassed.TotalSeconds;
+        int secondsInWork = WorkMinutes * 60;
+        int secondsInBreak = BreakMinutes * 60;
+        int secondsInSession = secondsInWork + secondsInBreak;
+        int currentSession = secondsPassed % secondsInSession;
+        bool InWork = currentSession <= secondsInWork;
+        bool InBreak = !InWork;
+        if (InWork)
+        {
+            if (!IsWorking)
+            {
+                IsWorking = true;
+                BreakTimeSound.Play();
+            }
+            int secondsLeftToWork = (secondsInSession - secondsInBreak) - currentSession;
+            int minutes = secondsLeftToWork / 60;
+            int seconds = secondsLeftToWork % 60;
+            BreakText.text = $"Next Break: <color=green>{minutes}:{seconds:00}</color>";
+        }
+        else
+        {
+            if (IsWorking)
+            {
+                IsWorking = false;
+                BreakTimeSound.Play();
+            }
+            int secondsLeftInBreak = secondsInSession - currentSession;
+            int minutes = secondsLeftInBreak / 60;
+            int seconds = secondsLeftInBreak % 60;
+            BreakText.text = $"<color=yellow>On Break: {minutes}:{seconds:00}</color>";
         }
     }
 
